@@ -31,7 +31,7 @@
 
 TEST_CASE("parallel_for")
 {
-  const size_t N_ELEMENTS = 1000000;
+  const size_t N_ELEMENTS = 1e8;
 
   const int bad_value  = 0;
   const int good_value = 1;
