@@ -58,12 +58,9 @@ mark_as_advanced(CMAKE_BUILD_TYPE)
 # Build tests
 ##############################################################
 
-set(LIBRARY_OUTPUT_PATH    ${CMAKE_BINARY_DIR})
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/tests)
 
-include_directories(
-  ${CMAKE_SOURCE_DIR}
-)
+include_directories(${CMAKE_SOURCE_DIR})
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
   include(cmake/icc.cmake)
@@ -89,4 +86,4 @@ if(DEFINED TASKING_SYSTEM_LIBS)
   target_link_libraries(test_parallel_for ${TASKING_SYSTEM_LIBS})
 endif()
 
-add_test(parallel_for test_parallel_for)
+add_test(parallel_for tests/test_parallel_for)
