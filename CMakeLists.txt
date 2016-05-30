@@ -38,6 +38,8 @@ cpw_setup_build_type()
 # we are only building tests, should probably stick with 'Release'
 mark_as_advanced(CMAKE_BUILD_TYPE)
 
+install(DIRECTORY CPW DESTINATION include)
+
 ##############################################################
 # Build tests
 ##############################################################
