@@ -130,3 +130,13 @@ macro(cpw_configure_tasking_system)
     endif()
   endif()
 endmacro()
+
+macro(cpw_add_test test_name)
+  add_executable(${test_name} ${ARGN})
+
+  if(DEFINED TASKING_SYSTEM_LIBS)
+    target_link_libraries(${test_name} ${TASKING_SYSTEM_LIBS})
+  endif()
+
+  add_test(${test_name} tests/${test_name})
+endmacro()
