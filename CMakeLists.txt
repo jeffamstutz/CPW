@@ -60,8 +60,16 @@ enable_testing()
 
 cpw_configure_tasking_system()
 
+# parallel_for
 cpw_add_test(parallel_for
   tests/doctest.h
   tests/parallel_for.cpp
   CPW/parallel_for.h
+)
+
+# async
+cpw_add_test(async
+  tests/doctest.h
+  tests/async.cpp
+  CPW/async.h
 )
