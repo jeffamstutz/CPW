@@ -27,6 +27,7 @@
 #include <CPW/async.h>
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <mutex>
 
@@ -36,14 +37,19 @@ TEST_CASE("async")
   std::mutex mutex;
   std::condition_variable condition;
 
-  auto *val_p = &val;
+  auto *val_p  = &val;
+  auto *cond_p = &condition;
 
   CPW::async([=](){
     *val_p = 1;
+    cond_p->notify_all();
   });
 
   std::unique_lock<std::mutex> lock(mutex);
-  condition.wait(lock, [&](){return val == 1;});
+  auto now = std::chrono::system_clock::now();
+  condition.wait_until(lock,
+                       now + std::chrono::seconds(3),
+                       [&](){ return val.load() == 1; });
 
   // NOTE(jda) - can't directly check std::atomic value due to compile error...
   int check_val = val;
