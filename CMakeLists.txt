@@ -79,7 +79,11 @@ enable_testing()
 
 cpw_configure_tasking_system()
 
-add_executable(test_parallel_for tests/parallel_for.cpp CPW/parallel_for.h)
+add_executable(test_parallel_for
+  tests/doctest.h
+  tests/parallel_for.cpp
+  CPW/parallel_for.h
+)
 
 if(DEFINED TASKING_SYSTEM_LIBS)
   target_link_libraries(test_parallel_for ${TASKING_SYSTEM_LIBS})
