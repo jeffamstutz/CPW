@@ -22,6 +22,28 @@
 ## DEALINGS IN THE SOFTWARE.                                                  ##
 ## ========================================================================== ##
 
+## CMAKE_BUILD_TYPE setup macro ##
+
+macro(cpw_setup_build_type)
+  # force 'Release' build type on initial configuration (otherwise is empty)
+  set(CONFIGURATION_TYPES "Debug" "Release" "RelWithDebInfo")
+  if (WIN32)
+    if (NOT DEFAULT_CMAKE_CONFIGURATION_TYPES_SET)
+      set(CMAKE_CONFIGURATION_TYPES "${CONFIGURATION_TYPES}"
+          CACHE STRING "List of generated configurations." FORCE)
+      set(DEFAULT_CMAKE_CONFIGURATION_TYPES_SET ON CACHE INTERNAL
+          "Default CMake configuration types set.")
+    endif()
+  else()
+    if(NOT CMAKE_BUILD_TYPE)
+      set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+          "Choose the type of build." FORCE)
+      set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
+                   STRINGS ${CONFIGURATION_TYPES})
+    endif()
+  endif()
+endmacro()
+
 ## Compiler configuration macro ##
 
 macro(cpw_configure_compiler)
@@ -130,6 +152,8 @@ macro(cpw_configure_tasking_system)
     endif()
   endif()
 endmacro()
+
+## Test target creation macro ##
 
 macro(cpw_add_test test_name)
   add_executable(${test_name} ${ARGN})

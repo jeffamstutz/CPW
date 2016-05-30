@@ -33,23 +33,7 @@ project(CPW)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 include(cmake/CPW.cmake)
 
-# force 'Release' build type on initial configuration (otherwise is empty)
-set(CONFIGURATION_TYPES "Debug" "Release" "RelWithDebInfo")
-if (WIN32)
-  if (NOT DEFAULT_CMAKE_CONFIGURATION_TYPES_SET)
-    set(CMAKE_CONFIGURATION_TYPES "${CONFIGURATION_TYPES}"
-        CACHE STRING "List of generated configurations." FORCE)
-    set(DEFAULT_CMAKE_CONFIGURATION_TYPES_SET ON CACHE INTERNAL
-        "Default CMake configuration types set.")
-  endif()
-else()
-  if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING 
-        "Choose the type of build." FORCE)
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY 
-                 STRINGS ${CONFIGURATION_TYPES})
-  endif()
-endif()
+cpw_setup_build_type()
 
 # we are only building tests, should probably stick with 'Release'
 mark_as_advanced(CMAKE_BUILD_TYPE)
