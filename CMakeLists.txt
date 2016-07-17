@@ -48,18 +48,9 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/tests)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Intel")
-  include(cmake/icc.cmake)
-elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-  include(cmake/gcc.cmake)
-elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  include(cmake/clang.cmake)
-elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
-  include(cmake/msvc.cmake)
-endif()
-
 enable_testing()
 
+cpw_configure_compiler()
 cpw_configure_tasking_system()
 
 # parallel_for
