@@ -53,6 +53,13 @@ enable_testing()
 cpw_configure_compiler()
 cpw_configure_tasking_system()
 
+# async
+cpw_add_test(async
+  tests/doctest.h
+  tests/async.cpp
+  CPW/async.h
+)
+
 # parallel_for
 cpw_add_test(parallel_for
   tests/doctest.h
@@ -60,9 +67,9 @@ cpw_add_test(parallel_for
   CPW/parallel_for.h
 )
 
-# async
-cpw_add_test(async
+# schedule
+cpw_add_test(schedule
   tests/doctest.h
-  tests/async.cpp
-  CPW/async.h
+  tests/schedule.cpp
+  CPW/schedule.h
 )

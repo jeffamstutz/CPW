@@ -1,7 +1,7 @@
 // ========================================================================== //
 // The MIT License (MIT)                                                      //
 //                                                                            //
-// Copyright (c) 2016 Jefferson Amstutz                                       //
+// Copyright (c) 2016-2017 Jefferson Amstutz                                  //
 //                                                                            //
 // Permission is hereby granted, free of charge, to any person obtaining a    //
 // copy of this software and associated documentation files (the "Software"), //
@@ -24,44 +24,35 @@
 
 #pragma once
 
-#include <CPW/TaskingTypeTraits.h>
+#include <functional>
+#include <future>
 
-#ifdef CPW_TASKING_TBB
-#  include <tbb/task.h>
-#elif defined(CPW_TASKING_CILK)
-#  include <cilk/cilk.h>
-#endif
+#include <CPW/schedule.h>
 
 namespace CPW {
 
-// NOTE(jda) - This abstraction takes a lambda which should take captured
-//             variables by *value* to ensure no captured references race
-//             with the task itself.
+  template<typename TASK_T>
+  using operator_return_t = typename std::result_of<TASK_T()>::type;
 
-// NOTE(jda) - No priority is associated with this call, but could be added
-//             later with a hint enum, using a default value for the priority
-//             to not require specifying it.
-template<typename TASK_T>
-inline void async(const TASK_T& fcn)
-{
-  static_assert(has_operator_method<TASK_T>::value,
-                "CPW::async() requires the implementation of method "
-                "'void TASK_T::operator()'.");
-
-#ifdef CPW_TASKING_TBB
-  struct LocalTBBTask : public tbb::task
+  // NOTE(jda) - This abstraction takes a lambda which should take captured
+  //             variables by *value* to ensure no captured references race
+  //             with the task itself.
+  template<typename TASK_T>
+  inline auto async(TASK_T&& fcn) -> std::future<operator_return_t<TASK_T>>
   {
-    TASK_T func;
-    tbb::task* execute() override { func(); return nullptr; }
-    LocalTBBTask( const TASK_T& f ) : func(f) {}
-  };
+    static_assert(has_operator_method<TASK_T>::value,
+                  "CPW::schedule() requires the implementation of method "
+                  "'RETURN_T TASK_T::operator()', where RETURN_T is the "
+                  "return value of the passed in task.");
 
-  tbb::task::enqueue(*new(tbb::task::allocate_root())LocalTBBTask(fcn));
-#elif defined(CPW_TASKING_CILK)
-  cilk_spawn fcn();
-#else// OpenMP or Debug --> synchronous!
-  fcn();
-#endif
-}
+    using package_t = std::packaged_task<operator_return_t<TASK_T>()>;
 
-}// namespace CPW
+    auto task   = new package_t(std::forward<TASK_T>(fcn));
+    auto future = task->get_future();
+
+    schedule([=](){ (*task)(); delete task; });
+
+    return future;
+  }
+
+} // namespace CPW

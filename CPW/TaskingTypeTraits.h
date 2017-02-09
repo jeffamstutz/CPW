@@ -1,18 +1,26 @@
-// ======================================================================== //
-// Copyright 2009-2016 Intel Corporation                                    //
-//                                                                          //
-// Licensed under the Apache License, Version 2.0 (the "License");          //
-// you may not use this file except in compliance with the License.         //
-// You may obtain a copy of the License at                                  //
-//                                                                          //
-//     http://www.apache.org/licenses/LICENSE-2.0                           //
-//                                                                          //
-// Unless required by applicable law or agreed to in writing, software      //
-// distributed under the License is distributed on an "AS IS" BASIS,        //
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. //
-// See the License for the specific language governing permissions and      //
-// limitations under the License.                                           //
-// ======================================================================== //
+// ========================================================================== //
+// The MIT License (MIT)                                                      //
+//                                                                            //
+// Copyright (c) 2016-2017 Jefferson Amstutz                                  //
+//                                                                            //
+// Permission is hereby granted, free of charge, to any person obtaining a    //
+// copy of this software and associated documentation files (the "Software"), //
+// to deal in the Software without restriction, including without limitation  //
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,   //
+// and/or sell copies of the Software, and to permit persons to whom the      //
+// Software is furnished to do so, subject to the following conditions:       //
+//                                                                            //
+// The above copyright notice and this permission notice shall be included in //
+// in all copies or substantial portions of the Software.                     //
+//                                                                            //
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR //
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,   //
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL    //
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER //
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING    //
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER        //
+// DEALINGS IN THE SOFTWARE.                                                  //
+// ========================================================================== //
 
 #pragma once
 
@@ -45,25 +53,25 @@ struct has_operator_method
 template <typename T>
 struct has_operator_method_with_integral_param
 {
-  using T_SHORT_PARAM    = void(T::*)(short)        const;
-  using T_INT_PARAM      = void(T::*)(int)          const;
-  using T_UNSIGNED_PARAM = void(T::*)(unsigned int) const;
-  using T_SIZET_PARAM    = void(T::*)(size_t)       const;
+  template <typename P>
+  using t_param    = void(T::*)(P) const;
+  using byte_t     = unsigned char;
+  using operator_t = decltype(&T::operator());
 
-  using PARAM_IS_SHORT    = std::is_same<T_SHORT_PARAM,
-                                         decltype(&T::operator())>;
-  using PARAM_IS_INT      = std::is_same<T_INT_PARAM,
-                                         decltype(&T::operator())>;
-  using PARAM_IS_UNSIGNED = std::is_same<T_UNSIGNED_PARAM,
-                                         decltype(&T::operator())>;
-  using PARAM_IS_SIZET    = std::is_same<T_SIZET_PARAM,
-                                         decltype(&T::operator())>;
+  using param_is_byte     = std::is_same<t_param<byte_t>  , operator_t>;
+  using param_is_short    = std::is_same<t_param<short>   , operator_t>;
+  using param_is_int      = std::is_same<t_param<int>     , operator_t>;
+  using param_is_unsigned = std::is_same<t_param<unsigned>, operator_t>;
+  using param_is_long     = std::is_same<t_param<long>    , operator_t>;
+  using param_is_size_t   = std::is_same<t_param<size_t>  , operator_t>;
 
   static const bool value = has_operator_method<T>::value &&
-                                (PARAM_IS_SHORT::value
-                                 || PARAM_IS_INT::value
-                                 || PARAM_IS_UNSIGNED::value
-                                 || PARAM_IS_SIZET::value);
+    (param_is_byte::value     ||
+     param_is_short::value    ||
+     param_is_int::value      ||
+     param_is_unsigned::value ||
+     param_is_long::value     ||
+     param_is_size_t::value);
 };
 
 }//namespace CPW
