@@ -29,33 +29,33 @@
 
 namespace CPW {
 
-// NOTE(jda) - This abstraction wraps "fork-join" parallelism, with an implied
-//             synchronizsation after all of the tasks have run.
-template<typename TASK_T>
-inline void parallel_for(int nTasks, TASK_T&& fcn)
-{
-  static_assert(has_operator_method_with_integral_param<TASK_T>::value,
-                "CPW::parallel_for() requires the implementation of "
-                "method 'void TASK_T::operator(P taskIndex), where P is of "
-                "type unsigned char, short, int, uint, long, or size_t.");
+  // NOTE(jda) - This abstraction wraps "fork-join" parallelism, with an implied
+  //             synchronizsation after all of the tasks have run.
+  template<typename TASK_T>
+  inline void parallel_for(int nTasks, TASK_T&& fcn)
+  {
+    static_assert(has_operator_method_with_integral_param<TASK_T>::value,
+                  "CPW::parallel_for() requires the implementation of "
+                  "method 'void TASK_T::operator(P taskIndex), where P is of "
+                  "type unsigned char, short, int, uint, long, or size_t.");
 
-  parallel_for_impl(nTasks, std::forward<TASK_T>(fcn));
-}
-
-// NOTE(jda) - Allow serial version of parallel_for() without the need to change
-//             the entire tasking system backend, for individual substitution
-//             while debugging.
-template<typename TASK_T>
-inline void serial_for(int nTasks, const TASK_T& fcn)
-{
-  static_assert(has_operator_method_with_integral_param<TASK_T>::value,
-                "CPW::serial_for() requires the implementation of "
-                "method 'void TASK_T::operator(P taskIndex), where P is of "
-                "type unsigned char, short, int, uint, long, or size_t.");
-
-  for (int taskIndex = 0; taskIndex < nTasks; ++taskIndex) {
-    fcn(taskIndex);
+    parallel_for_impl(nTasks, std::forward<TASK_T>(fcn));
   }
-}
+
+  // NOTE(jda) - Allow serial version of parallel_for() without the need to change
+  //             the entire tasking system backend, for individual substitution
+  //             while debugging.
+  template<typename TASK_T>
+  inline void serial_for(int nTasks, const TASK_T& fcn)
+  {
+    static_assert(has_operator_method_with_integral_param<TASK_T>::value,
+                  "CPW::serial_for() requires the implementation of "
+                  "method 'void TASK_T::operator(P taskIndex), where P is of "
+                  "type unsigned char, short, int, uint, long, or size_t.");
+
+    for (int taskIndex = 0; taskIndex < nTasks; ++taskIndex) {
+      fcn(taskIndex);
+    }
+  }
 
 }// namespace CPW

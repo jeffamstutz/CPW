@@ -34,35 +34,35 @@
 
 namespace CPW {
 
-template<typename TASK_T>
-inline void schedule_impl(TASK_T&& fcn)
-{
-#ifdef CPW_TASKING_TBB
-  struct LocalTBBTask : public tbb::task
+  template<typename TASK_T>
+  inline void schedule_impl(TASK_T&& fcn)
   {
-    TASK_T func;
-    tbb::task* execute() override { func(); return nullptr; }
-    LocalTBBTask(TASK_T&& f) : func(std::forward<TASK_T>(f)) {}
-  };
+#ifdef CPW_TASKING_TBB
+    struct LocalTBBTask : public tbb::task
+    {
+      TASK_T func;
+      tbb::task* execute() override { func(); return nullptr; }
+      LocalTBBTask(TASK_T&& f) : func(std::forward<TASK_T>(f)) {}
+    };
 
-  auto *tbb_node =
-      new(tbb::task::allocate_root())LocalTBBTask(std::forward<TASK_T>(fcn));
-  tbb::task::enqueue(*tbb_node);
+    auto *tbb_node =
+        new(tbb::task::allocate_root())LocalTBBTask(std::forward<TASK_T>(fcn));
+    tbb::task::enqueue(*tbb_node);
 #elif defined(CPW_TASKING_CILK)
-  cilk_spawn fcn();
+    cilk_spawn fcn();
 #elif defined(CPW_TASKING_INTERNAL)
-  struct LocalTask : public Task {
-    TASK_T t;
-    LocalTask(TASK_T&& fcn)
-      : Task("LocalTask"), t(std::forward<TASK_T>(fcn)) {}
-    void run(size_t) override { t(); }
-  };
+    struct LocalTask : public Task {
+      TASK_T t;
+      LocalTask(TASK_T&& fcn)
+        : Task("LocalTask"), t(std::forward<TASK_T>(fcn)) {}
+      void run(size_t) override { t(); }
+    };
 
-  Ref<LocalTask> task = new LocalTask(std::forward<TASK_T>(fcn));
-  task->schedule(1, Task::FRONT_OF_QUEUE);
+    Ref<LocalTask> task = new LocalTask(std::forward<TASK_T>(fcn));
+    task->schedule(1, Task::FRONT_OF_QUEUE);
 #else// OpenMP or Debug --> synchronous!
-  fcn();
+    fcn();
 #endif
-}
+  }
 
 } // namespace CPW

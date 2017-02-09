@@ -46,4 +46,4 @@ namespace CPW {
     schedule_impl(std::forward<TASK_T>(fcn));
   }
 
-} // ::ospcommon
+} // namespace CPW
