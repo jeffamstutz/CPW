@@ -38,7 +38,17 @@ cpw_setup_build_type()
 # we are only building tests, should probably stick with 'Release'
 mark_as_advanced(CMAKE_BUILD_TYPE)
 
+add_library(CPW INTERFACE)
+target_include_directories(CPW INTERFACE
+	$<INSTALL_INTERFACE:include/CPW>)
+
 install(DIRECTORY CPW DESTINATION include)
+install(TARGETS CPW
+	EXPORT CPWConfig
+	RUNTIME DESTINATION bin/CPW
+	ARCHIVE DESTINATION lib/CPW
+	LIBRARY DESTINATION lib/CPW)
+install(EXPORT CPWConfig DESTINATION lib/cmake/CPW)
 
 ##############################################################
 # Build tests
